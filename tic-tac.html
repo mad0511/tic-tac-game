@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f0f0f0;
+    }
+    #game-container {
+        width: 300px;
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .board {
+        display: grid;
+        grid-template-columns: repeat(3, 80px);
+        grid-template-rows: repeat(3, 80px);
+        gap: 5px;
+        margin: 20px auto;
+    }
+    .cell {
+        width: 80px;
+        height: 80px;
+        font-size: 36px;
+        border: 2px solid #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+    .message {
+        margin-top: 20px;
+        font-size: 20px;
+    }
+    .reset-btn {
+        margin-top: 20px;
+        font-size: 16px;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+    h1 {
+        font-size: 36px;
+        margin-bottom: 20px;
+    }
+	.win-message {
+    font-size: 24px;
+    font-weight: bold;
+    color: green;
+    margin-top: 20px;
+}
+</style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>Tic Tac Toe</h1>
+    <div class="board" id="board"></div>
+    <div class="message" id="message">X's Turn</div>
+    <button class="reset-btn" onclick="reset()">Reset</button>
+</div>
+
+<script>
+    let board = ['', '', '', '', '', '', '', '', '']; // Represents the Tic Tac Toe board
+    let currentPlayer = 'X'; // X starts the game
+    let gameActive = true;
+
+    const winningCombinations = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6] // Diagonals
+    ];
+
+    const boardElement = document.getElementById('board');
+    const messageElement = document.getElementById('message');
+
+    // Function to create the board
+    function createBoard() {
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.setAttribute('data-cell-index', i);
+            cell.addEventListener('click', handleCellClick);
+            boardElement.appendChild(cell);
+        }
+    }
+
+    // Function to handle cell click
+    function handleCellClick(e) {
+        const clickedCellIndex = parseInt(e.target.getAttribute('data-cell-index'));
+        if (board[clickedCellIndex] === '' && gameActive) {
+            board[clickedCellIndex] = currentPlayer;
+            e.target.textContent = currentPlayer;
+            checkWin();
+            checkDraw();
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            messageElement.textContent = currentPlayer + "'s Turn";
+        }
+    }
+
+	// Function to check for a win
+	function checkWin() {
+		for (let i = 0; i < winningCombinations.length; i++) {
+			const [a, b, c] = winningCombinations[i];
+			if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+				highlightWinningCells(winningCombinations[i]);
+				gameActive = false;
+				setTimeout(() => {
+					if (board[a] === 'X') {
+						window.alert('Hurray! X Wins!');
+					} else {
+						window.alert('Hurray! O Wins!');
+					}
+				}, 100); // Delay the alert to ensure the cells are highlighted first
+				return;
+			}
+		}
+	}
+
+    // Function to check for a draw
+    function checkDraw() {
+        if (board.every(cell => cell !== '')) {
+            window.alert('Draw!');
+            gameActive = false;
+        }
+    }
+
+    // Function to highlight the winning cells
+    function highlightWinningCells(winningCombination) {
+        winningCombination.forEach(index => {
+            const cellElement = boardElement.children[index];
+            cellElement.style.backgroundColor = 'lightgreen';
+        });
+    }
+
+    // Function to reset the game
+    function reset() {
+        board = ['', '', '', '', '', '', '', '', ''];
+        currentPlayer = 'X';
+        gameActive = true;
+        messageElement.textContent = "X's Turn";
+        boardElement.querySelectorAll('.cell').forEach(cell => {
+            cell.textContent = '';
+            cell.style.backgroundColor = '';
+        });
+    }
+
+    // Initialize the board
+    createBoard();
+</script>
+
+</body>
+</html>
